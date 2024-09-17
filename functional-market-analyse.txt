@@ -1,0 +1,95 @@
+let fruitsStock = [
+    { id: 1, name: "Pomme", quantity: 10 },
+    { id: 2, name: "Poire", quantity: 5 },
+    { id: 3, name: "Ananas", quantity: 8 }
+  ];
+  
+  /* 
+  analyse : 
+  La variable fruitsStock est mutée directement tout au long du programme. 
+  Ce qui  peut poser problème dans des scénarios fonctionnels où l'immuabilité est importante. 
+  Il faut retourner une nouvelle version du tableau après chaque modification pour respecter l'immuabilité.
+  */
+  
+  
+  function addFruitToStock(name: string, quantity: number) {
+    const existingProduct = fruitsStock.find((p) => p.name === name);
+  
+    if (existingProduct) {
+      // on modifie directement l'objet trouvé dans le stock
+      existingProduct.quantity += quantity;
+    } else {
+      // Si le fruit n'existe pas, on pousse directement un nouvel élément dans le tableau
+      fruitsStock.push({ id: fruitsStock.length + 1, name, quantity });
+    }
+    /* 
+    Analyse : 
+    La fonction modifie directement existingProduct ou ajoute un fruit dans fruitsStock. Ce qui va à l'encontre de l'immuabilité. 
+    De plus, la fonction n'a pas de retour explicite, ce qui rend la gestion d'erreurs ou d'événements difficiles à tracer.
+    Plutôt que de modifier directement le stock, on pourrait retourner un nouveau tableau modifié sans impacter l'original.
+    Il serait aussi intéressant de retourner une structure de type Either pour indiquer si l'ajout a été un succès ou non, avec un traitement explicite des erreurs.
+    */
+  }
+  
+  
+  function deleteFruit(name: string) {
+    fruitsStock = fruitsStock.filter((p) => p.name !== name);
+    console.log(`${name} deleted from stock`);
+    
+    /* 
+    Observations :
+    fruitsStock est directement modifié, ce qui ne respecte pas l'immuabilité.
+    Le console.log produit un effet secondaire.
+    La fonction devrait retourner un nouveau tableau sans le fruit supprimé, sans modifier le tableau global.
+    Plutôt que d'utiliser console.log, retourner une valeur ou un message d'erreur à traiter plus tard par exemple via une structure Either
+    */
+  }
+  
+  
+  function showStock() {
+    fruitsStock.forEach((fruit) => {
+      console.log(`Fruit : ${fruit.name} | Quantity : ${fruit.quantity}`);
+    });
+    
+    /* 
+    Cette fonction produit uniquement un effet secondaire console.log, ce qui rend son comportement non pur.
+    la fonction pourrait retourner une chaîne formatée qui représente l'état du stock, au lieu de faire un log. 
+    Cela permettrait de laisser le choix au code appelant de décider quoi faire du résultat affichage ou autre traitement
+    */
+  }
+  
+  
+  function sellFruit(name: string, quantity: number) {
+    const fruit = fruitsStock.find((p) => p.name === name);
+  
+    if (fruit && fruit.quantity >= quantity) {
+      fruit.quantity -= quantity;
+      console.log(`${quantity} ${name} sold`);
+    } else {
+      console.log(`Not enough ${name} or unknown fruit`);
+    }
+    
+    /* 
+    Comme pour addFruitToStock, on modifie directement fruit.quantity, ce qui va à l'encontre de l'immuabilité.
+    les erreurs fruit non trouvé ou quantité insuffisante sont gérées par des logs, 
+    ce qui rend difficile la gestion de ces cas à un niveau supérieur dans le code.
+  
+    Plutôt que de muter l'objet fruit directement, retourner un nouveau tableau où la quantité est modifiée.
+    Utiliser une structure de type `Either` pour renvoyer un message d'erreur si le fruit n'existe pas ou si la quantité est insuffisante, afin que cela puisse être géré ailleurs.
+    */
+  }
+  
+  
+  // Appels de fonctions
+  addFruitToStock("Pomme", 5);
+  addFruitToStock("Citron", 10);
+  sellFruit("Ananas", 2);
+  showStock();
+  deleteFruit("Ananas");
+  showStock();
+  
+  /*
+  Ces appels fonctionnent correctement, mais la structure générale repose sur la mutation d'état global le tableau fruitsStock.
+  Il serait plus intéressant de composer des fonctions qui retournent des résultats ou des erreurs de manière explicite, sans dépendre des effets secondaires comme console.log
+  */
+  
