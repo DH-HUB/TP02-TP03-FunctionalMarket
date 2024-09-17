@@ -1,5 +1,4 @@
 "use strict";
-
 // Définir un type pour chaque fruit dans le stock
 // Ce type garantit que chaque élément du stock a les propriétés id, name, et quantity.
 export interface Fruit {
